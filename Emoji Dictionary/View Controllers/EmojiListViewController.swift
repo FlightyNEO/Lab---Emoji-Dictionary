@@ -99,7 +99,7 @@ extension EmojiListViewController {
             let emoji = controller.emoji
             //print(#line, #function, emoji.symbol, emoji.name)
             
-            let index = emojis.insertionIndexOf(element: emoji, isOrderedBefore: <)
+            let index = emojis.insertionIndexOf(emoji, <)
             let indexPath = IndexPath(row: index, section: 0)
             
             emojis.insert(emoji, at: index)
