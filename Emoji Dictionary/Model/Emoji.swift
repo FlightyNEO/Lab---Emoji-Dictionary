@@ -6,7 +6,7 @@
 //  Copyright © 2019 Denis Bystruev. All rights reserved.
 //
 
-class Emoji {
+class Emoji: Codable {
     
     var symbol: String
     var name: String

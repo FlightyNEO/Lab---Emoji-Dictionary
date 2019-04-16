@@ -6,6 +6,8 @@
 //  Copyright © 2019 Denis Bystruev. All rights reserved.
 //
 
+import Foundation
+
 typealias Emojis = [Emoji]
 
 extension Emojis {
@@ -25,6 +27,21 @@ extension Emojis {
         
         return emojis.sorted()
         
+    }
+    
+}
+
+// MARK: - Codable
+extension Emojis {
+    
+    init?(from data: Data) {
+        guard let emojis = try? PropertyListDecoder().decode(Emojis.self, from: data) else { return nil }
+        
+        self = emojis
+    }
+    
+    var encoded: Data? {
+        return try? PropertyListEncoder().encode(self)
     }
     
 }

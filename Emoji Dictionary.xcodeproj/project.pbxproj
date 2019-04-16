@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		586A8E9F2266417F000B34CF /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586A8E9E2266417F000B34CF /* DataManager.swift */; };
 		58FA42CA226392640044B535 /* Array+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FA42C9226392640044B535 /* Array+Extension.swift */; };
 		696BA137225FB24800028C62 /* EmojiListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696BA136225FB24800028C62 /* EmojiListViewController.swift */; };
 		696BA139225FB26400028C62 /* EmojiDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696BA138225FB26400028C62 /* EmojiDetailViewController.swift */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		586A8E9E2266417F000B34CF /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		58FA42C9226392640044B535 /* Array+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extension.swift"; sourceTree = "<group>"; };
 		696BA136225FB24800028C62 /* EmojiListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiListViewController.swift; sourceTree = "<group>"; };
 		696BA138225FB26400028C62 /* EmojiDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiDetailViewController.swift; sourceTree = "<group>"; };
@@ -53,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				69938DA8225FC56200043187 /* TableViewCellConfigurator.swift */,
+				586A8E9E2266417F000B34CF /* DataManager.swift */,
 			);
 			path = "Other controllers";
 			sourceTree = "<group>";
@@ -205,6 +208,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				69938DA9225FC56200043187 /* TableViewCellConfigurator.swift in Sources */,
+				586A8E9F2266417F000B34CF /* DataManager.swift in Sources */,
 				69938DA6225FC05E00043187 /* EmojiCell.swift in Sources */,
 				69EF2054225FAF1C006DF9E3 /* AppDelegate.swift in Sources */,
 				58FA42CA226392640044B535 /* Array+Extension.swift in Sources */,

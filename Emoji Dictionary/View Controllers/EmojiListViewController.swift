@@ -13,7 +13,7 @@ class EmojiListViewController: UITableViewController {
     let cellID = "EmojiCell"
     
     private let configurator = TableViewCellConfigurator()
-    private var emojis = Emojis.loadSample()
+    private var emojis = Emojis()
     
     private var editingIndexPath: IndexPath?
     private var mode: Mode?
@@ -34,6 +34,10 @@ class EmojiListViewController: UITableViewController {
         navigationItem.title = emojis.title
         
         self.navigationItem.leftBarButtonItem = self.editButtonItem
+        
+        guard let emojis = try? DataManager.fetchEmojis() else { return }
+        self.emojis = emojis
+        
     }
     
 }
@@ -134,6 +138,8 @@ extension EmojiListViewController: EmojiDetailViewControllerDelegate {
             emojis[indexPath.row] = emoji
             tableView.reloadRows(at: [indexPath], with: .automatic)
         }
+        
+        try? DataManager.reWriteEmoji(emojis)
         
     }
     
