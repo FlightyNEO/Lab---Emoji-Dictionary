@@ -49,6 +49,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		586A8E9822660914000B34CF /* Other controllers */ = {
+			isa = PBXGroup;
+			children = (
+				69938DA8225FC56200043187 /* TableViewCellConfigurator.swift */,
+			);
+			path = "Other controllers";
+			sourceTree = "<group>";
+		};
+		586A8E992266093D000B34CF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				69EF2053225FAF1C006DF9E3 /* AppDelegate.swift */,
+				69EF2057225FAF1C006DF9E3 /* Main.storyboard */,
+				69EF205A225FAF22006DF9E3 /* Assets.xcassets */,
+				69EF205C225FAF22006DF9E3 /* LaunchScreen.storyboard */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		696BA13A225FB32300028C62 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -94,16 +113,13 @@
 		69EF2052225FAF1C006DF9E3 /* Emoji Dictionary */ = {
 			isa = PBXGroup;
 			children = (
+				586A8E9822660914000B34CF /* Other controllers */,
 				69938DAA225FCE1E00043187 /* Extensions */,
 				696BA143225FBFDD00028C62 /* View */,
 				696BA13A225FB32300028C62 /* Model */,
 				69EF2067225FB1BE006DF9E3 /* View Controllers */,
-				69EF2053225FAF1C006DF9E3 /* AppDelegate.swift */,
-				69EF2057225FAF1C006DF9E3 /* Main.storyboard */,
-				69EF205A225FAF22006DF9E3 /* Assets.xcassets */,
-				69EF205C225FAF22006DF9E3 /* LaunchScreen.storyboard */,
+				586A8E992266093D000B34CF /* Resources */,
 				69EF205F225FAF22006DF9E3 /* Info.plist */,
-				69938DA8225FC56200043187 /* TableViewCellConfigurator.swift */,
 			);
 			path = "Emoji Dictionary";
 			sourceTree = "<group>";

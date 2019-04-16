@@ -61,6 +61,7 @@
                                     <outlet property="emojiDescriptionLabel" destination="dLW-JD-m54" id="w6x-nQ-Jki"/>
                                     <outlet property="emojiNameLabel" destination="Ssy-rB-ZQU" id="72K-rX-jbC"/>
                                     <outlet property="emojiSymbolLabel" destination="Bm3-N8-w4C" id="vyy-MR-thW"/>
+                                    <segue destination="msT-dF-J42" kind="show" identifier="ShowEmojiIdentifier" id="Cym-aX-DPC"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -217,16 +218,25 @@
                                 <segue destination="UXf-j4-sun" kind="unwind" identifier="CancelSegue" unwindAction="unwindWithSegue:" id="7Ck-kn-DXK"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Save" style="done" id="j76-id-FYA">
-                            <connections>
-                                <segue destination="UXf-j4-sun" kind="unwind" identifier="SaveSegue" unwindAction="unwindWithSegue:" id="5HF-oG-qhr"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem title="Save" style="done" id="j76-id-FYA">
+                                <connections>
+                                    <segue destination="UXf-j4-sun" kind="unwind" identifier="SaveSegue" unwindAction="unwindWithSegue:" id="5HF-oG-qhr"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Edit" id="nOE-PF-PCl">
+                                <connections>
+                                    <action selector="actionEdit:" destination="msT-dF-J42" id="jox-yO-Vgr"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
+                        <outlet property="cancelAndBackButton" destination="hg7-vY-y2F" id="xbz-Ii-D8A"/>
                         <outlet property="descriptionField" destination="Mix-me-2zy" id="EKj-sO-UsT"/>
+                        <outlet property="editButton" destination="nOE-PF-PCl" id="J1Y-z1-NH7"/>
                         <outlet property="nameField" destination="aB4-S4-8YZ" id="mAc-o0-HOo"/>
-                        <outlet property="saveButton" destination="j76-id-FYA" id="fUq-E4-f7t"/>
+                        <outlet property="saveAndCancelButton" destination="j76-id-FYA" id="19e-xo-UVf"/>
                         <outlet property="symbolField" destination="CWL-x9-u66" id="4pf-3q-d6Q"/>
                         <outlet property="usageField" destination="jEJ-r2-oqt" id="LmQ-sB-9Bj"/>
                     </connections>
@@ -254,6 +264,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="lLY-67-UuU"/>
+        <segue reference="Cym-aX-DPC"/>
     </inferredMetricsTieBreakers>
 </document>

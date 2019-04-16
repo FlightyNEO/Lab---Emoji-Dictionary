@@ -8,10 +8,17 @@
 
 import UIKit
 
+protocol EmojiDetailViewControllerDelegate: class {
+    func didUpdateEmoji(_ emoji: Emoji)
+}
+
 class EmojiDetailViewController: UITableViewController {
     
     // MARK: ... IBOutlets
-    @IBOutlet weak var saveButton: UIBarButtonItem!
+    @IBOutlet weak var saveAndCancelButton: UIBarButtonItem!
+    @IBOutlet weak var cancelAndBackButton: UIBarButtonItem!
+    @IBOutlet weak var editButton: UIBarButtonItem!
+    
     @IBOutlet weak var symbolField: UITextField!
     @IBOutlet weak var nameField: UITextField!
     @IBOutlet weak var descriptionField: UITextField!
@@ -24,7 +31,29 @@ class EmojiDetailViewController: UITableViewController {
         case description = 80
     }
     
+    private enum Mode {
+        case review
+        case edit(readyToSave: Bool)
+    }
+    
+    private var mode = Mode.review {
+        didSet {
+            switch mode {
+            case .review:
+                editButton?.title = "Edit"
+            case .edit(readyToSave: let isReady):
+                editButton?.title = isReady ? "Save" : "Cancel"
+            }
+        }
+    }
+    
     private var textFields: [UITextField] {
+        guard
+            symbolField != nil,
+            nameField != nil,
+            descriptionField != nil,
+            usageField != nil else { return [] }
+        
         return [symbolField, nameField, descriptionField, usageField]
     }
     
@@ -37,6 +66,14 @@ class EmojiDetailViewController: UITableViewController {
     
     // MARK: ... Proprties
     var emoji = Emoji()
+    weak var delegate: EmojiDetailViewControllerDelegate?
+    
+    var isEditable = false {
+        didSet {
+            mode = isEditable ? .edit(readyToSave: true) : .review
+            updateUI()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,19 +86,25 @@ class EmojiDetailViewController: UITableViewController {
         emoji.name = nameField.text ?? ""
         emoji.description = descriptionField.text ?? ""
         emoji.usage = usageField.text ?? ""
+        
+        delegate?.didUpdateEmoji(emoji)
     }
     
     private func setupUI() {
-        symbolField.text = emoji.symbol
-        nameField.text = emoji.name
-        descriptionField.text = emoji.description
-        usageField.text = emoji.usage
+        navigationItem.rightBarButtonItems?.removeAll { $0 == (isEditable ? editButton : saveAndCancelButton) }
+        navigationItem.leftBarButtonItem = isEditable ? cancelAndBackButton : nil
         
         updateUI()
     }
     
     private func updateUI() {
-        saveButton.isEnabled = areFieldsReady()
+        symbolField?.text = emoji.symbol
+        nameField?.text = emoji.name
+        descriptionField?.text = emoji.description
+        usageField?.text = emoji.usage
+        
+        saveAndCancelButton?.isEnabled = areFieldsReady()
+        textFields.forEach { $0.isEnabled = isEditable }
     }
     
 }
@@ -73,6 +116,27 @@ extension EmojiDetailViewController {
         if segue.identifier == "SaveSegue" {
             saveEmoji()
         }
+    }
+    
+}
+
+// MARK: - Actions
+extension EmojiDetailViewController {
+    
+    @IBAction func actionEdit(_ sender: UIBarButtonItem) {
+        
+        switch mode {
+        case .review:
+            isEditable.toggle()
+            symbolField.becomeFirstResponder()
+        case .edit(let readyToSave) where readyToSave:
+            saveEmoji()
+            title = nameField.text
+            fallthrough
+        default:
+            isEditable.toggle()
+        }
+        
     }
     
 }
@@ -98,7 +162,8 @@ extension EmojiDetailViewController: UITextFieldDelegate {
         
         // check areFieldsReady
         let textFields = self.textFields.filter { $0 != textField }
-        saveButton.isEnabled = !newString.isEmpty && areFieldsReady(textFields)
+        saveAndCancelButton?.isEnabled = !newString.isEmpty && areFieldsReady(textFields)
+        mode = .edit(readyToSave: !newString.isEmpty && areFieldsReady(textFields))
         
         return true
     }

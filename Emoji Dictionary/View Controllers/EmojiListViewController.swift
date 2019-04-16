@@ -11,16 +11,23 @@ import UIKit
 class EmojiListViewController: UITableViewController {
     
     let cellID = "EmojiCell"
-    private let editEmojiIdentifier = "EditEmojiIdentifier"
-    private let addEmojiIdentifier = "AddEmojiIdentifier"
-    let configurator = TableViewCellConfigurator()
-    var emojis = Emojis.loadSample()
+    
+    private let configurator = TableViewCellConfigurator()
+    private var emojis = Emojis.loadSample()
     
     private var editingIndexPath: IndexPath?
-    private var condition: Condition?
+    private var mode: Mode?
     
-    enum Condition {
-        case edit, add
+    private enum Mode {
+        case edit, add, show
+        
+        var identifier: String {
+            switch self {
+            case .edit: return "EditEmojiIdentifier"
+            case .add: return "AddEmojiIdentifier"
+            case .show: return "ShowEmojiIdentifier"
+            }
+        }
     }
     
     override func viewDidLoad() {
@@ -28,6 +35,11 @@ class EmojiListViewController: UITableViewController {
         
         self.navigationItem.leftBarButtonItem = self.editButtonItem
     }
+    
+}
+
+// MARK: - Tble view data source & delegate
+extension EmojiListViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return emojis.count
@@ -46,7 +58,7 @@ class EmojiListViewController: UITableViewController {
         
         let editAction = UITableViewRowAction(style: .normal, title: "Edit") { (_, indexPath) in
             self.editingIndexPath = indexPath
-            self.performSegue(withIdentifier: self.editEmojiIdentifier, sender: indexPath.row)
+            self.performSegue(withIdentifier: Mode.edit.identifier, sender: indexPath.row)
         }
         
         editAction.backgroundColor = .orange
@@ -59,6 +71,9 @@ class EmojiListViewController: UITableViewController {
         return [deleteAction, editAction]
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.editingIndexPath = indexPath
+    }
 }
 
 // MARK: - Navigation
@@ -66,58 +81,60 @@ extension EmojiListViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        if segue.identifier == editEmojiIdentifier {
+        if let emojiDetailViewController = segue.destination as? EmojiDetailViewController {
             
-            guard let emojiDetailViewController = segue.destination as? EmojiDetailViewController,
-            let row = sender as? Int else { return }
+            emojiDetailViewController.delegate = self
             
-            condition = .edit
+            switch segue.identifier {
+            case Mode.edit.identifier:
+                guard let row = sender as? Int else { return }
+                emojiDetailViewController.emoji = self.emojis[row]
+                emojiDetailViewController.title = "Edit"
+                emojiDetailViewController.isEditable = true
+                mode = .edit
+            case Mode.add.identifier:
+                emojiDetailViewController.title = "Add"
+                emojiDetailViewController.isEditable = true
+                mode = .add
+            case Mode.show.identifier:
+                guard let row = tableView.indexPathForSelectedRow?.row else { return }
+                let emoji = self.emojis[row]
+                emojiDetailViewController.emoji = emoji
+                emojiDetailViewController.title = emoji.name
+                emojiDetailViewController.isEditable = false
+                mode = .show
+            default: break
+            }
             
-            emojiDetailViewController.emoji = self.emojis[row]
-            emojiDetailViewController.title = "Edit"
-            
-        } else if segue.identifier == addEmojiIdentifier {
-            
-            guard let emojiDetailViewController = segue.destination as? EmojiDetailViewController else { return }
-            
-            condition = .add
-            
-            emojiDetailViewController.title = "Add"
         }
         
     }
     
     @IBAction func unwind(segue: UIStoryboardSegue) {
+        self.editingIndexPath = nil
+        self.mode = nil
+    }
+    
+}
+
+extension EmojiListViewController: EmojiDetailViewControllerDelegate {
+    
+    func didUpdateEmoji(_ emoji: Emoji) {
         
-        guard
-            let condition = condition,
-            segue.identifier == "SaveSegue" else { return }
+        guard let mode = mode else { return }
         
-        if condition == .add {
-        
-            let controller = segue.source as! EmojiDetailViewController
-            let emoji = controller.emoji
-            //print(#line, #function, emoji.symbol, emoji.name)
-            
+        switch mode {
+        case .add:
             let index = emojis.insertionIndexOf(emoji, <)
             let indexPath = IndexPath(row: index, section: 0)
-            
             emojis.insert(emoji, at: index)
             tableView.insertRows(at: [indexPath], with: .automatic)
-            
-        } else if condition == .edit {
-            
-            let controller = segue.source as! EmojiDetailViewController
-            let emoji = controller.emoji
-            
+        case .edit, .show:
             guard let indexPath = editingIndexPath else { return }
             emojis[indexPath.row] = emoji
-            
             tableView.reloadRows(at: [indexPath], with: .automatic)
-            
         }
         
-        self.condition = nil
     }
     
 }
