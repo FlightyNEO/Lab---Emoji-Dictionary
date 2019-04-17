@@ -99,13 +99,15 @@ extension EmojiListViewController {
             if self.isSearchResult {
                 let deletedEmoji = self.searchedEmojis[indexPath.row]
                 guard let index = self.emojis.firstIndex(of: deletedEmoji) else { return }
-                self.searchedEmojis.remove(at: indexPath.row)
-                self.emojis.remove(at: index)
+                self.searchedEmojis.remove(at: indexPath.row)   // remove "emoji" from searched array
+                self.emojis.remove(at: index)   // remove "emoji" from head array
             } else {
-                self.emojis.remove(at: indexPath.row)
+                self.emojis.remove(at: indexPath.row)   // remove "emoji" from head array
             }
             
             tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            try? DataManager.reWriteEmoji(self.emojis)
         }
         
         return [deleteAction, editAction]
