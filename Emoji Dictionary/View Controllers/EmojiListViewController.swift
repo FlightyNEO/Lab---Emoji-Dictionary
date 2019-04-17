@@ -58,6 +58,15 @@ class EmojiListViewController: UITableViewController {
         controller.isEditable = isEditable
     }
     
+    private func changeVisualizationSearchBar() {
+        searchBar.showsScopeBar.toggle()
+        searchBar.sizeToFit()
+        searchBar.setShowsCancelButton(searchBar.showsScopeBar, animated: true)
+        
+        tableView.beginUpdates()
+        tableView.endUpdates()
+    }
+    
 }
 
 // MARK: - Tble view data source & delegate
@@ -86,7 +95,16 @@ extension EmojiListViewController {
         editAction.backgroundColor = .orange
         
         let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (_, _) in
-            self.emojis.remove(at: indexPath.row)
+            
+            if self.isSearchResult {
+                let deletedEmoji = self.searchedEmojis[indexPath.row]
+                guard let index = self.emojis.firstIndex(of: deletedEmoji) else { return }
+                self.searchedEmojis.remove(at: indexPath.row)
+                self.emojis.remove(at: index)
+            } else {
+                self.emojis.remove(at: indexPath.row)
+            }
+            
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
         
@@ -105,6 +123,8 @@ extension EmojiListViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         if let emojiDetailViewController = segue.destination as? EmojiDetailViewController {
+            
+            searchBar.resignFirstResponder()
             
             emojiDetailViewController.delegate = self
             
@@ -132,7 +152,6 @@ extension EmojiListViewController {
     @IBAction func unwind(segue: UIStoryboardSegue) {
         self.editingIndexPath = nil
         self.mode = nil
-        searchBar.resignFirstResponder()
     }
     
 }
@@ -192,33 +211,41 @@ extension EmojiListViewController: UISearchBarDelegate {
         searchBar.resignFirstResponder()
     }
     
-//    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-//        
-//        searchBar.showsScopeBar.toggle()
-//        searchBar.sizeToFit()
-//        searchBar.setShowsCancelButton(searchBar.showsScopeBar, animated: true)
-//        
-//        tableView.beginUpdates()
-//        tableView.endUpdates()
-//        
-//        return true
-//    }
-//    
-//    func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
-//        
-//        searchBar.showsScopeBar.toggle()
-//        searchBar.sizeToFit()
-//        searchBar.setShowsCancelButton(searchBar.showsScopeBar, animated: true)
-//        
-//        tableView.beginUpdates()
-//        tableView.endUpdates()
-//        
-//        return true
-//    }
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        changeVisualizationSearchBar()
+        return true
+    }
+
+    func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
+        changeVisualizationSearchBar()
+        return true
+    }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
-        let searched = emojis.filter { $0.name.lowercased().contains(searchText.lowercased()) }
+        var searched = Emojis()
+        
+        switch searchBar.selectedScopeButtonIndex {
+        
+        case 0: // SEARCH OF NAME
+            
+            searched = emojis.filter { $0.name.lowercased().contains(searchText.lowercased()) }
+            
+        case 1: // SEARCH OF ALL FIELDS
+            
+            searched = emojis.filter {
+                let text = searchText.lowercased()
+                return
+                    $0.symbol.lowercased() == text ||
+                    $0.name.lowercased().contains(text) ||
+                    $0.description.lowercased().contains(text) ||
+                    $0.usage.lowercased().contains(text)
+                
+            }
+            
+        default: break
+            
+        }
         
         searchedEmojis = searched
         tableView.reloadData()
