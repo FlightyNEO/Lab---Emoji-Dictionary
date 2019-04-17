@@ -10,10 +10,15 @@ import UIKit
 
 class EmojiListViewController: UITableViewController {
     
-    let cellID = "EmojiCell"
+    // MARK: ... IBOutlets
+    @IBOutlet weak var searchBar: UISearchBar!
+    
+    // MARK: ... Private properties
+    private let cellID = "EmojiCell"
     
     private let configurator = TableViewCellConfigurator()
     private var emojis = Emojis()
+    private var searchedEmojis = Emojis()
     
     private var editingIndexPath: IndexPath?
     private var mode: Mode?
@@ -30,6 +35,12 @@ class EmojiListViewController: UITableViewController {
         }
     }
     
+    private var isSearchResult: Bool {
+        guard let text = searchBar.text else { return false }
+        return !text.isEmpty
+    }
+    
+    // MARK: ... Life cicle
     override func viewDidLoad() {
         navigationItem.title = emojis.title
         
@@ -40,17 +51,24 @@ class EmojiListViewController: UITableViewController {
         
     }
     
+    // MARK: ... Private methods
+    private func fillDetailController(_ controller: EmojiDetailViewController, emoji: Emoji?, title: String?, isEditable: Bool) {
+        controller.emoji = emoji
+        controller.title = title ?? emoji?.name
+        controller.isEditable = isEditable
+    }
+    
 }
 
 // MARK: - Tble view data source & delegate
 extension EmojiListViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return emojis.count
+        return isSearchResult ? searchedEmojis.count : emojis.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let emoji = emojis[indexPath.row]
+        let emoji = isSearchResult ? searchedEmojis[indexPath.row] : emojis[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: cellID) as! EmojiCell
         
         configurator.configure(cell, with: emoji)
@@ -77,6 +95,7 @@ extension EmojiListViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.editingIndexPath = indexPath
+        searchBar.resignFirstResponder()
     }
 }
 
@@ -92,20 +111,16 @@ extension EmojiListViewController {
             switch segue.identifier {
             case Mode.edit.identifier:
                 guard let row = sender as? Int else { return }
-                emojiDetailViewController.emoji = self.emojis[row]
-                emojiDetailViewController.title = "Edit"
-                emojiDetailViewController.isEditable = true
+                let emoji = isSearchResult ? searchedEmojis[row] : emojis[row]
+                fillDetailController(emojiDetailViewController, emoji: emoji, title: "Edit", isEditable: true)
                 mode = .edit
             case Mode.add.identifier:
-                emojiDetailViewController.title = "Add"
-                emojiDetailViewController.isEditable = true
+                fillDetailController(emojiDetailViewController, emoji: nil, title: "Add", isEditable: true)
                 mode = .add
             case Mode.show.identifier:
                 guard let row = tableView.indexPathForSelectedRow?.row else { return }
-                let emoji = self.emojis[row]
-                emojiDetailViewController.emoji = emoji
-                emojiDetailViewController.title = emoji.name
-                emojiDetailViewController.isEditable = false
+                let emoji = isSearchResult ? searchedEmojis[row] : emojis[row]
+                fillDetailController(emojiDetailViewController, emoji: emoji, title: nil, isEditable: false)
                 mode = .show
             default: break
             }
@@ -117,10 +132,12 @@ extension EmojiListViewController {
     @IBAction func unwind(segue: UIStoryboardSegue) {
         self.editingIndexPath = nil
         self.mode = nil
+        searchBar.resignFirstResponder()
     }
     
 }
 
+// MARK: - Emoji detail view controller delegate
 extension EmojiListViewController: EmojiDetailViewControllerDelegate {
     
     func didUpdateEmoji(_ emoji: Emoji) {
@@ -129,17 +146,82 @@ extension EmojiListViewController: EmojiDetailViewControllerDelegate {
         
         switch mode {
         case .add:
-            let index = emojis.insertionIndexOf(emoji, <)
-            let indexPath = IndexPath(row: index, section: 0)
-            emojis.insert(emoji, at: index)
-            tableView.insertRows(at: [indexPath], with: .automatic)
+            
+            let indexOfEmojis = emojis.insertionIndexOf(emoji, <)
+            let indexPath = IndexPath(row: indexOfEmojis, section: 0)
+            emojis.insert(emoji, at: indexOfEmojis)
+            
+            if isSearchResult {
+                searchBar.text = nil
+                tableView.reloadData()
+            } else {
+                tableView.insertRows(at: [indexPath], with: .automatic)
+            }
+            
         case .edit, .show:
-            guard let indexPath = editingIndexPath else { return }
-            emojis[indexPath.row] = emoji
-            tableView.reloadRows(at: [indexPath], with: .automatic)
+            
+            guard let editingIndexPath = editingIndexPath else { return }
+            
+            if isSearchResult {
+                let modifiedEmoji = searchedEmojis[editingIndexPath.row]
+                guard let index = emojis.firstIndex(of: modifiedEmoji) else { return }
+                emojis[index] = emoji
+                searchBar.text = nil
+                tableView.reloadData()
+            } else {
+                emojis[editingIndexPath.row] = emoji
+                tableView.reloadRows(at: [editingIndexPath], with: .automatic)
+            }
+            
         }
         
         try? DataManager.reWriteEmoji(emojis)
+        
+    }
+    
+}
+
+// MARK: - Text field delegate
+extension EmojiListViewController: UISearchBarDelegate {
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
+//    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+//        
+//        searchBar.showsScopeBar.toggle()
+//        searchBar.sizeToFit()
+//        searchBar.setShowsCancelButton(searchBar.showsScopeBar, animated: true)
+//        
+//        tableView.beginUpdates()
+//        tableView.endUpdates()
+//        
+//        return true
+//    }
+//    
+//    func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
+//        
+//        searchBar.showsScopeBar.toggle()
+//        searchBar.sizeToFit()
+//        searchBar.setShowsCancelButton(searchBar.showsScopeBar, animated: true)
+//        
+//        tableView.beginUpdates()
+//        tableView.endUpdates()
+//        
+//        return true
+//    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        let searched = emojis.filter { $0.name.lowercased().contains(searchText.lowercased()) }
+        
+        searchedEmojis = searched
+        tableView.reloadData()
         
     }
     

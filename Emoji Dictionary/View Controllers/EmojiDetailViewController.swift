@@ -65,7 +65,7 @@ class EmojiDetailViewController: UITableViewController {
     }
     
     // MARK: ... Proprties
-    var emoji = Emoji()
+    var emoji: Emoji!
     weak var delegate: EmojiDetailViewControllerDelegate?
     
     var isEditable = false {
@@ -77,6 +77,11 @@ class EmojiDetailViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if emoji == nil {
+            emoji = Emoji()
+        }
+        
         setupUI()
     }
     
