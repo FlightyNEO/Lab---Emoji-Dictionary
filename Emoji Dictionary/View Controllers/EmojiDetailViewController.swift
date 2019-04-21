@@ -36,13 +36,15 @@ class EmojiDetailViewController: UITableViewController {
         case edit(readyToSave: Bool)
     }
     
-    private var mode = Mode.review {
+    private var mode: Mode = .review {
         didSet {
             switch mode {
             case .review:
                 editButton?.title = "Edit"
+                editButton?.isEnabled = true
             case .edit(readyToSave: let isReady):
-                editButton?.title = isReady ? "Save" : "Cancel"
+                editButton?.title = "Save"
+                editButton?.isEnabled = isReady ? true : false
             }
         }
     }
@@ -64,6 +66,10 @@ class EmojiDetailViewController: UITableViewController {
         return true
     }
     
+    private lazy var cancelButton: UIBarButtonItem? = {
+        return UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(actionCancel))
+    }()
+    
     // MARK: ... Proprties
     var emoji: Emoji!
     weak var delegate: EmojiDetailViewControllerDelegate?
@@ -78,7 +84,6 @@ class EmojiDetailViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Hide keyboard after tap is dode
         hideKeyboardWhenTappedAround()
         
         if emoji == nil {
@@ -99,13 +104,23 @@ class EmojiDetailViewController: UITableViewController {
     }
     
     private func setupUI() {
+        
         navigationItem.rightBarButtonItems?.removeAll { $0 == (isEditable ? editButton : saveAndCancelButton) }
-        navigationItem.leftBarButtonItem = isEditable ? cancelAndBackButton : nil
+        
+        if isEditable {
+            editButton = nil
+        } else {
+            cancelAndBackButton = nil
+            saveAndCancelButton = nil
+        }
         
         updateUI()
     }
     
     private func updateUI() {
+        
+        navigationItem.leftBarButtonItem = isEditable ? (cancelAndBackButton ?? cancelButton) : nil
+        
         symbolField?.text = emoji.symbol
         nameField?.text = emoji.name
         descriptionField?.text = emoji.description
@@ -131,17 +146,19 @@ extension EmojiDetailViewController {
 // MARK: - Actions
 extension EmojiDetailViewController {
     
+    @objc private func actionCancel() {
+        isEditable.toggle()
+    }
+    
     @IBAction func actionEdit(_ sender: UIBarButtonItem) {
         
         switch mode {
         case .review:
             isEditable.toggle()
             symbolField.becomeFirstResponder()
-        case .edit(let readyToSave) where readyToSave:
+        case .edit:
             saveEmoji()
             title = nameField.text
-            fallthrough
-        default:
             isEditable.toggle()
         }
         
