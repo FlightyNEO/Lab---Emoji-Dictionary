@@ -41,9 +41,11 @@ class EmojiDetailViewController: UITableViewController {
             switch mode {
             case .review:
                 editButton?.title = "Edit"
+                editButton.style = .plain
                 editButton?.isEnabled = true
             case .edit(readyToSave: let isReady):
                 editButton?.title = "Save"
+                editButton?.style = isReady ? .done : .plain
                 editButton?.isEnabled = isReady ? true : false
             }
         }

@@ -58,7 +58,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Emoji Dictionary/View Controllers/EmojiDetailViewController.swift"
-            timestampString = "577543567.234472"
+            timestampString = "577544943.800167"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "41"
@@ -74,11 +74,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Emoji Dictionary/View Controllers/EmojiDetailViewController.swift"
-            timestampString = "577543567.234545"
+            timestampString = "577544943.800868"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "79"
-            endingLineNumber = "79"
+            startingLineNumber = "82"
+            endingLineNumber = "82"
             landmarkName = "isEditable"
             landmarkType = "24">
          </BreakpointContent>
