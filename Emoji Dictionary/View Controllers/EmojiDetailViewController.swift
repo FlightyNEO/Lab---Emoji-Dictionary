@@ -25,10 +25,10 @@ class EmojiDetailViewController: UITableViewController {
     @IBOutlet weak var usageField: UITextField!
     
     // MARK: ... Private proprties
-    private enum MaxLenght: Int {
+    private enum MaxLength: Int {
         case symbol = 1
         case name = 20
-        case description = 80
+        case description = 50
     }
     
     private enum Mode {
@@ -176,11 +176,11 @@ extension EmojiDetailViewController: UITextFieldDelegate {
         
         switch textField {
         case symbolField:
-            guard newString.count <= MaxLenght.symbol.rawValue else { return false }
+            guard newString.count <= MaxLength.symbol.rawValue else { return false }
         case nameField:
-            guard newString.count <= MaxLenght.name.rawValue else { return false }
+            guard newString.count <= MaxLength.name.rawValue else { return false }
         case descriptionField, usageField:
-            guard newString.count <= MaxLenght.description.rawValue else { return false }
+            guard newString.count <= MaxLength.description.rawValue else { return false }
         default:
             break
         }
