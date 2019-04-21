@@ -78,6 +78,9 @@ class EmojiDetailViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Hide keyboard after tap is dode
+        hideKeyboardWhenTappedAround()
+        
         if emoji == nil {
             emoji = Emoji()
         }
